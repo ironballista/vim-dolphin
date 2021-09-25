@@ -218,6 +218,7 @@ bool KItemListController::singleClickActivationEnforced() const
     return m_singleClickActivationEnforced;
 }
 
+// AUDEDIT
 bool KItemListController::keyPressEvent(QKeyEvent* event)
 {
     int index = m_selectionManager->currentItem();
@@ -225,11 +226,11 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
 
     // Handle the expanding/collapsing of items
     if (m_view->supportsItemExpanding() && m_model->isExpandable(index)) {
-        if (key == Qt::Key_Right) {
+        if (key == Qt::Key_Right || key == Qt::Key_L) {
             if (m_model->setExpanded(index, true)) {
                 return true;
             }
-        } else if (key == Qt::Key_Left) {
+        } else if (key == Qt::Key_Left || key == Qt::Key_H) {
             if (m_model->setExpanded(index, false)) {
                 return true;
             }
@@ -242,7 +243,9 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
     const bool navigationPressed = key == Qt::Key_Home || key == Qt::Key_End  ||
                                    key == Qt::Key_PageUp || key == Qt::Key_PageDown ||
                                    key == Qt::Key_Up || key == Qt::Key_Down ||
-                                   key == Qt::Key_Left || key == Qt::Key_Right;
+                                   key == Qt::Key_Left || key == Qt::Key_Right ||
+                                   key == Qt::Key_H || key == Qt::Key_L ||
+                                   key == Qt::Key_J || key == Qt::Key_J;
 
     const int itemCount = m_model->count();
 
@@ -250,11 +253,28 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
     // the arrow keys to simplify the event handling.
     if (m_view->scrollOrientation() == Qt::Horizontal) {
         switch (key) {
-        case Qt::Key_Up:    key = Qt::Key_Left; break;
-        case Qt::Key_Down:  key = Qt::Key_Right; break;
-        case Qt::Key_Left:  key = Qt::Key_Up; break;
-        case Qt::Key_Right: key = Qt::Key_Down; break;
-        default:            break;
+        case Qt::Key_Up:
+	case Qt::Key_K:
+		key = Qt::Key_Left;
+		break;
+
+        case Qt::Key_Down:
+        case Qt::Key_J:
+		key = Qt::Key_Right;
+		break;
+
+        case Qt::Key_Left:
+        case Qt::Key_H:
+		key = Qt::Key_Up;
+		break;
+
+        case Qt::Key_Right:
+        case Qt::Key_L:
+		key = Qt::Key_Down;
+		break;
+
+        default:
+		break;
         }
     }
 
@@ -280,6 +300,7 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
         break;
 
     case Qt::Key_Left:
+    case Qt::Key_H:
         if (index > 0) {
             const int expandedParentsCount = m_model->expandedParentsCount(index);
             if (expandedParentsCount == 0) {
@@ -296,6 +317,7 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
         break;
 
     case Qt::Key_Right:
+    case Qt::Key_L:
         if (index < itemCount - 1) {
             ++index;
             m_keyboardAnchorIndex = index;
@@ -304,11 +326,13 @@ bool KItemListController::keyPressEvent(QKeyEvent* event)
         break;
 
     case Qt::Key_Up:
+    case Qt::Key_K:
         updateKeyboardAnchor();
         index = previousRowIndex(index);
         break;
 
     case Qt::Key_Down:
+    case Qt::Key_J:
         updateKeyboardAnchor();
         index = nextRowIndex(index);
         break;
